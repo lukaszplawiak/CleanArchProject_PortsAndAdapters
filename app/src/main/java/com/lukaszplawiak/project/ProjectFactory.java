@@ -1,9 +1,7 @@
 package com.lukaszplawiak.project;
 
-
 import com.lukaszplawiak.project.dto.ProjectDto;
 
-import java.util.stream.Collectors;
 
 class ProjectFactory {
     Project from(ProjectDto source) {

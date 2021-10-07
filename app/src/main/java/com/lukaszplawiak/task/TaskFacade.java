@@ -2,13 +2,12 @@ package com.lukaszplawiak.task;
 
 import com.lukaszplawiak.project.dto.SimpleProjectQueryEntity;
 import com.lukaszplawiak.task.dto.TaskDto;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
-@Service
+
 public class TaskFacade {
     private final TaskFactory taskFactory;
     private final TaskRepository taskRepository;

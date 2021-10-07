@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -21,12 +22,12 @@ class TaskController {
 
     @GetMapping
     List<TaskDto> list() {
-        return taskQueryRepository.findAllBy();
+        return new ArrayList<>(taskQueryRepository.findBy(TaskDto.class)); // zaszła konwersja ze Set na List, wiec zwracamy nową ArrayList
     }
 
     @GetMapping(params = "changes")
     List<TaskWithChangesDto> listWithChanges() {
-        return taskQueryRepository.findAllWithChangesBy();
+        return new ArrayList<>(taskQueryRepository.findBy(TaskWithChangesDto.class));
     }
 
     @GetMapping("/{id}")

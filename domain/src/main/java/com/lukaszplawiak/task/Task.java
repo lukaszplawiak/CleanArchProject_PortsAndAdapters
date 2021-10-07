@@ -1,35 +1,20 @@
 package com.lukaszplawiak.task;
 
 import com.lukaszplawiak.project.dto.SimpleProjectQueryEntity;
-import org.springframework.data.annotation.PersistenceConstructor;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.time.ZonedDateTime;
 
-import static javax.persistence.GenerationType.IDENTITY;
 
-@Entity
-@Table(name = "tasks")
 class Task {
-    @Id
-    @GeneratedValue(strategy = IDENTITY)
     private int id;
-    @NotNull
     private String description;
     private boolean done;
     private ZonedDateTime deadline;
     private int changesCount;
     private String additionalComment;
-    @ManyToOne
-    @JoinColumn(name = "source_id")
     private SimpleProjectQueryEntity project;
 
-    @PersistenceConstructor
-    protected Task() {
-    }
-
-    Task(@NotNull String description, ZonedDateTime deadline, SimpleProjectQueryEntity project) {
+    Task(String description, ZonedDateTime deadline, SimpleProjectQueryEntity project) {
         this.description = description;
         this.deadline = deadline;
         this.project = project;

@@ -2,12 +2,10 @@ package com.lukaszplawiak.project;
 
 import com.lukaszplawiak.project.dto.ProjectDto;
 import com.lukaszplawiak.project.dto.ProjectStepDto;
-
 import com.lukaszplawiak.project.dto.SimpleProjectQueryEntity;
+import com.lukaszplawiak.task.TaskFacade;
 import com.lukaszplawiak.task.TaskQueryRepository;
 import com.lukaszplawiak.task.dto.TaskDto;
-import com.lukaszplawiak.task.TaskFacade;
-import org.springframework.stereotype.Service;
 
 import java.time.ZonedDateTime;
 import java.util.HashSet;
@@ -17,7 +15,7 @@ import java.util.Set;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
-@Service
+
 public class ProjectFacade {
     private final ProjectFactory projectFactory;
     private final ProjectRepository projectRepository;
