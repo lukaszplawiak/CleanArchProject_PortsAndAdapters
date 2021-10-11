@@ -9,50 +9,50 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-interface SqlTaskRepository extends Repository<SqlTask, Integer> {
-    Optional<SqlTask> findById(Integer id); // metoda ktora odzcytuje tylko pojedynczy task oraz tak która zapisuje pojedynczy task tp sa dwie rzeczy które zostawiamy w tym repo - to jeset repo do zapisu
+interface SqlTaskRepository extends Repository<TaskSnapshot, Integer> {
+    Optional<TaskSnapshot> findById(Integer id); // metoda ktora odzcytuje tylko pojedynczy task oraz tak która zapisuje pojedynczy task tp sa dwie rzeczy które zostawiamy w tym repo - to jeset repo do zapisu
 
-    SqlTask save(SqlTask entity);
+    TaskSnapshot save(TaskSnapshot entity);
 
-    List<SqlTask> saveAll(Iterable<SqlTask> entities);
+    List<TaskSnapshot> saveAll(Iterable<TaskSnapshot> entities);
 
     void deleteById(Integer id);
 }
 @org.springframework.stereotype.Repository
 class TaskRepositoryImpl implements TaskRepository {
-    private final SqlTaskRepository sqlTaskRepository;
+    private final SqlTaskRepository repository;
 
-    TaskRepositoryImpl(final SqlTaskRepository sqlTaskRepository) {
-        this.sqlTaskRepository = sqlTaskRepository;
+    TaskRepositoryImpl(final SqlTaskRepository repository) {
+        this.repository = repository;
     }
 
     @Override
     public Optional<Task> findById(final Integer id) {
-        return sqlTaskRepository.findById(id).map(SqlTask::toTask);
+        return repository.findById(id).map(Task::restore);
     }
 
     @Override
     public Task save(final Task entity) {
-        return sqlTaskRepository.save(SqlTask.fromTask(entity)).toTask();
+        return Task.restore(repository.save(entity.getSnapshot()));
     }
 
     @Override
     public List<Task> saveAll(final Iterable<Task> entities) {
-        return sqlTaskRepository.saveAll(StreamSupport.stream(entities.spliterator(), false)
-                .map(SqlTask::fromTask)
+        return repository.saveAll(StreamSupport.stream(entities.spliterator(), false)
+                .map(Task::getSnapshot)
                 .collect(Collectors.toList())
         ).stream()
-                .map(SqlTask::toTask)
+                .map(Task::restore)
                 .collect(Collectors.toList());
     }
 
     @Override
     public void deleteById(final Integer id) {
-        sqlTaskRepository.deleteById(id);
+        repository.deleteById(id);
     }
 }
 
-interface SqlTaskQueryRepository extends TaskQueryRepository, Repository<SqlTask, Integer> {
+interface SqlTaskQueryRepository extends TaskQueryRepository, Repository<TaskSnapshot, Integer> {
 }
 @org.springframework.stereotype.Repository
 class TaskQueryRepositoryImpl implements TaskQueryRepository {

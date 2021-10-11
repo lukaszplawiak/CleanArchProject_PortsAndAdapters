@@ -3,7 +3,9 @@ package com.lukaszplawiak.project;
 import java.util.Optional;
 
 interface ProjectRepository {
-    <S extends Project> S save(S entity);
+    Project save(Project entity);
 
-    Optional<Project> findById(Integer integer);
+    Optional<Project> findById(Integer id);
+
+    void delete(Project.Step entity);
 }

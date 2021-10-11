@@ -1,78 +1,61 @@
 package com.lukaszplawiak.task;
 
-import com.lukaszplawiak.project.dto.SimpleProjectQueryEntity;
+import com.lukaszplawiak.project.dto.SimpleProject;
 
 import java.time.ZonedDateTime;
 
 
 class Task {
+    static Task restore(TaskSnapshot snapshot) {
+        return new Task(
+                snapshot.getId(),
+                snapshot.getDescription(),
+                snapshot.isDone(),
+                snapshot.getDeadline(),
+                snapshot.getChangesCount(),
+                snapshot.getAdditionalComment(),
+                snapshot.getProject() == null ? null : SimpleProject.restore(snapshot.getProject())
+        );
+    }
     private int id;
     private String description;
     private boolean done;
     private ZonedDateTime deadline;
     private int changesCount;
     private String additionalComment;
-    private SimpleProjectQueryEntity project;
+    private SimpleProject project;
 
-    Task(String description, ZonedDateTime deadline, SimpleProjectQueryEntity project) {
+    protected Task(final int id, final String description, final boolean done, final ZonedDateTime deadline, final int changesCount, final String additionalComment, final SimpleProject project) {
+        this.id = id;
         this.description = description;
+        this.done = done;
         this.deadline = deadline;
+        this.changesCount = changesCount;
+        this.additionalComment = additionalComment;
         this.project = project;
     }
 
-    int getId() {
-        return id;
+    void toggle() {
+        done = !done;
+        ++changesCount;
     }
 
-    void setId(int id) {
-        this.id = id;
-    }
-
-    String getDescription() {
-        return description;
-    }
-
-    void setDescription(String description) {
+    void updateInfo(final String description,final ZonedDateTime deadline,final String additionalComment) {
         this.description = description;
-    }
-
-    boolean isDone() {
-        return done;
-    }
-
-    void setDone(boolean done) {
-        this.done = done;
-    }
-
-    ZonedDateTime getDeadline() {
-        return deadline;
-    }
-
-    void setDeadline(ZonedDateTime deadline) {
         this.deadline = deadline;
-    }
-
-    int getChangesCount() {
-        return changesCount;
-    }
-
-    void setChangesCount(int changesCount) {
-        this.changesCount = changesCount;
-    }
-
-    String getAdditionalComment() {
-        return additionalComment;
-    }
-
-    void setAdditionalComment(String additionalComment) {
         this.additionalComment = additionalComment;
     }
 
-    SimpleProjectQueryEntity getProject() {
-        return project;
+    TaskSnapshot getSnapshot() {
+        return new TaskSnapshot(
+                id,
+                description,
+                done,
+                deadline,
+                changesCount,
+                additionalComment,
+                project == null ? null : project.getSnapshot()
+        );
     }
 
-    void setProject(SimpleProjectQueryEntity project) {
-        this.project = project;
-    }
 }

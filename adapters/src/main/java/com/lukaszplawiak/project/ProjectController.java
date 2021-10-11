@@ -7,7 +7,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
+
 
 @RestController
 @RequestMapping("/projects")
@@ -22,7 +24,7 @@ class ProjectController {
 
     @GetMapping
     List<ProjectDto> list() {
-        return projectQueryRepository.findBy();
+        return new ArrayList<>(projectQueryRepository.findBy(ProjectDto.class));
     }
 
     @GetMapping("/{id}")
@@ -33,8 +35,8 @@ class ProjectController {
     }
 
     @PutMapping("/{id}")
-    ResponseEntity<Project> update(@PathVariable int id, @RequestBody ProjectDto toUpdate) {
-        if (id != toUpdate.getId() && toUpdate.getId() != 0) {
+    public ResponseEntity<Project> update(@PathVariable int id, @RequestBody ProjectDto toUpdate) {
+        if (id != toUpdate.getId()) {
             throw new IllegalStateException("Id in URL is different than in body: " + id + " and " + (toUpdate.getId() == 0 ? "empty" : toUpdate.getId()));
         }
         projectFacade.save(toUpdate);
