@@ -1,6 +1,5 @@
 package com.lukaszplawiak.task;
 
-import com.lukaszplawiak.project.dto.SimpleProject;
 import com.lukaszplawiak.task.dto.TaskDto;
 
 

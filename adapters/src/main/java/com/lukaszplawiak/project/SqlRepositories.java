@@ -1,6 +1,8 @@
 package com.lukaszplawiak.project;
 
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
+import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 
@@ -8,6 +10,10 @@ interface SqlProjectRepository extends Repository<ProjectSnapshot, Integer> {
     ProjectSnapshot save(ProjectSnapshot entity);
 
     Optional<ProjectSnapshot> findById(Integer id);
+
+    @Query(nativeQuery = true,
+    value = "select distinct * from projects p join project_steps ps on p.id = ps.project_id where ps.id = :id")
+    Optional<ProjectSnapshot> findWithNestedStepId(@Param("id") Integer id);
 }
 
 interface SqlProjectQueryRepository extends ProjectQueryRepository, Repository<ProjectSnapshot, Integer> {
@@ -35,6 +41,11 @@ class ProjectRepositoryImpl implements ProjectRepository {
     @Override
     public Optional<Project> findById(final Integer id) {
         return repository.findById(id).map(Project::restore);
+    }
+
+    @Override
+    public Optional<Project> findByNestedStepId(final Integer id) {
+        return repository.findWithNestedStepId(id).map(Project::restore);
     }
 
     @Override

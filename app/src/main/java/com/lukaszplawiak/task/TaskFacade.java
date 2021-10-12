@@ -7,7 +7,6 @@ import com.lukaszplawiak.task.vo.TaskEvent;
 
 import java.util.List;
 import java.util.Set;
-import java.util.logging.ConsoleHandler;
 
 import static java.util.stream.Collectors.toList;
 

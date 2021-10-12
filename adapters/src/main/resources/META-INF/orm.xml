@@ -32,16 +32,6 @@
         </attributes>
     </entity>
 
-    <entity class="com.lukaszplawiak.project.dto.SimpleProjectSnapshot" access="FIELD">
-        <table name="projects"/>
-        <attributes>
-            <id name="id">
-                <generated-value strategy="IDENTITY"/>
-            </id>
-            <basic name="name"/>
-        </attributes>
-    </entity>
-
     <entity class="com.lukaszplawiak.project.ProjectSnapshot" access="FIELD">
         <table name="projects"/>
         <attributes>
@@ -70,10 +60,12 @@
             <basic name="daysToProjectDeadline">
                 <column nullable="false"/>
             </basic>
+            <basic name="hasCorrespondingTask"/>
+            <basic name="correspondingTaskDone"/>
         </attributes>
     </entity>
-    
-    <embeddable class="com.lukaszplawiak.task.vo.TaskSourceId">
+
+    <embeddable class="com.lukaszplawiak.task.vo.TaskSourceId" access="FIELD">
         <attributes>
             <basic name="id">
                 <column nullable="false"/>

@@ -1,5 +1,6 @@
 package com.lukaszplawiak.task;
 
+import com.lukaszplawiak.DomainEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -7,8 +8,8 @@ import org.springframework.context.annotation.Configuration;
 class TaskConfiguration {
 
     @Bean
-    TaskFacade taskFacade(final TaskRepository taskRepository) {
-        return new TaskFacade(new TaskFactory(), taskRepository);
+    TaskFacade taskFacade(final TaskRepository taskRepository, DomainEventPublisher publisher) {
+        return new TaskFacade(new TaskFactory(), taskRepository, publisher);
     }
 
 }

@@ -3,9 +3,9 @@ package com.lukaszplawiak.project;
 import com.lukaszplawiak.project.dto.ProjectDto;
 import com.lukaszplawiak.project.dto.ProjectStepDto;
 import com.lukaszplawiak.task.TaskFacade;
-import com.lukaszplawiak.task.TaskQueryRepository;
 import com.lukaszplawiak.task.dto.TaskDto;
 import com.lukaszplawiak.task.vo.TaskCreator;
+import com.lukaszplawiak.task.vo.TaskEvent;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -18,13 +18,35 @@ public class ProjectFacade {
     private final ProjectFactory projectFactory;
     private final ProjectRepository projectRepository;
     private final TaskFacade taskFacade;
-    private final TaskQueryRepository taskQueryRepository;
 
-    ProjectFacade(final ProjectFactory projectFactory, final ProjectRepository projectRepository, final TaskFacade taskFacade, final TaskQueryRepository taskQueryRepository) {
+    ProjectFacade(final ProjectFactory projectFactory, final ProjectRepository projectRepository, final TaskFacade taskFacade ) {
         this.projectFactory = projectFactory;
         this.projectRepository = projectRepository;
         this.taskFacade = taskFacade;
-        this.taskQueryRepository = taskQueryRepository;
+    }
+
+    public void handle(TaskEvent event) {
+        int stepId = Integer.parseInt(event.getSourceId().getId());  // tutaj mamy getId jako String, wiec musimy sparsowac na int
+        switch (event.getState()) {
+            case DELETED:
+                updateStep(stepId, true);
+                break;
+            case UNDONE:
+                updateStep(stepId, false);
+                break;
+            case UPDATED:
+            case DONE:
+            default:
+                break;
+        }
+    }
+
+    void updateStep(int stepId, boolean done) {
+        projectRepository.findByNestedStepId(stepId)
+                .ifPresent(project -> {
+                    project.updateStep(stepId, done);
+                    projectRepository.save(project);
+                });
     }
 
     public ProjectDto save(ProjectDto dtoToSave) {
@@ -48,11 +70,9 @@ public class ProjectFacade {
     }
 
     List<TaskDto> createTasks(int projectId, ZonedDateTime projectDeadline) {
-        if (taskQueryRepository.existsByDoneIsFalseAndProject_Id(projectId)) {
-            throw new IllegalStateException("There are still some undone tasks from a previous project instance!");
-        }
         return projectRepository.findById(projectId).map(project -> {
             Set<TaskCreator> tasks = project.convertToTasks(projectDeadline);
+            projectRepository.save(project);
             return taskFacade.createTasks(tasks);
         }).orElseThrow(() -> new IllegalArgumentException("No project found with id: " + projectId));
     }

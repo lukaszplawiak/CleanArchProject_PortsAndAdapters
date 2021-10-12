@@ -18,9 +18,9 @@ class ProjectInitializer {
                     0,
                     "ExampleProject",
                     Set.of(
-                            new ProjectStepSnapshot(0, "First", -3),
-                            new ProjectStepSnapshot(0, "Second", -2),
-                            new ProjectStepSnapshot(0, "Third", 0)
+                            new ProjectStepSnapshot(0, "First", -3, false, false),
+                            new ProjectStepSnapshot(0, "Second", -2, false, false),
+                            new ProjectStepSnapshot(0, "Third", 0, false, false)
                     )
             )));
         }

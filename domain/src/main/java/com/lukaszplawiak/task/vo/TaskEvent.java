@@ -28,7 +28,7 @@ public class TaskEvent implements DomainEvent {
         return occurredOn;
     }
 
-    public TaskSourceId getId() {
+    public TaskSourceId getSourceId() {
         return id;
     }
 

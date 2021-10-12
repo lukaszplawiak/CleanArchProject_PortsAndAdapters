@@ -1,23 +1,26 @@
 package com.lukaszplawiak.task;
 
-import com.lukaszplawiak.task.dto.TaskDto;
 import org.springframework.data.repository.Repository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import static java.util.stream.Collectors.toList;
+
 interface SqlTaskRepository extends Repository<TaskSnapshot, Integer> {
-    Optional<TaskSnapshot> findById(Integer id); // metoda ktora odzcytuje tylko pojedynczy task oraz tak która zapisuje pojedynczy task tp sa dwie rzeczy które zostawiamy w tym repo - to jeset repo do zapisu
+    Optional<TaskSnapshot> findById(Integer id);
 
-    TaskSnapshot save(TaskSnapshot entity);
+    <S extends TaskSnapshot> S save(S entity);
 
-    List<TaskSnapshot> saveAll(Iterable<TaskSnapshot> entities);
+    <S extends TaskSnapshot> List<S> saveAll(Iterable<S> entities);
 
     void deleteById(Integer id);
 }
+
+interface SqlTaskQueryRepository extends TaskQueryRepository, Repository<TaskSnapshot, Integer> {
+}
+
 @org.springframework.stereotype.Repository
 class TaskRepositoryImpl implements TaskRepository {
     private final SqlTaskRepository repository;
@@ -38,12 +41,13 @@ class TaskRepositoryImpl implements TaskRepository {
 
     @Override
     public List<Task> saveAll(final Iterable<Task> entities) {
-        return repository.saveAll(StreamSupport.stream(entities.spliterator(), false)
-                .map(Task::getSnapshot)
-                .collect(Collectors.toList())
-        ).stream()
+        return repository.saveAll(
+                        StreamSupport.stream(entities.spliterator(), false)
+                                .map(Task::getSnapshot)
+                                .collect(toList())
+                ).stream()
                 .map(Task::restore)
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 
     @Override
@@ -51,35 +55,3 @@ class TaskRepositoryImpl implements TaskRepository {
         repository.deleteById(id);
     }
 }
-
-interface SqlTaskQueryRepository extends TaskQueryRepository, Repository<TaskSnapshot, Integer> {
-}
-@org.springframework.stereotype.Repository
-class TaskQueryRepositoryImpl implements TaskQueryRepository {
-    private final SqlTaskQueryRepository taskQueryRepository;
-
-    TaskQueryRepositoryImpl(final SqlTaskQueryRepository taskQueryRepository) {
-        this.taskQueryRepository = taskQueryRepository;
-    }
-
-    @Override
-    public int count() {
-        return 0;
-    }
-
-    @Override
-    public Optional<TaskDto> findDtoById(final int id) {
-        return Optional.empty();
-    }
-
-    @Override
-    public boolean existsByDoneIsFalseAndProject_Id(final int id) {
-        return false;
-    }
-
-    @Override
-    public <T> Set<T> findBy(final Class<T> type) {
-        return null;
-    }
-}
-

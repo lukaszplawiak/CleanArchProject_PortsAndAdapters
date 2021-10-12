@@ -30,13 +30,24 @@ class Project {
     }
 
     Set<TaskCreator> convertToTasks(final ZonedDateTime deadline) {
-        return steps.stream()
-                .map(step -> new TaskCreator(
+        if (steps.stream().anyMatch(step -> step.hasCorrespondingTask && !step.correspondingTaskDone)) {
+            throw new IllegalStateException("There are still some undone tasks for previous project instance");
+        }
+        var result = steps.stream().map(step -> new TaskCreator(
                         new TaskSourceId(String.valueOf(step.id)),
                         step.description,
                         deadline.plusDays(step.daysToProjectDeadline)
                         )
                 ).collect(Collectors.toSet());
+        // FIXME: we are not sure yet that task was created, should be dedicated event
+        steps.forEach(step -> step.hasCorrespondingTask = true);
+        return result;
+    }
+
+    void updateStep(final int stepId, final boolean taskDone) {
+        steps.stream()
+                .filter(step -> step.id == stepId)
+                .forEach(step -> step.correspondingTaskDone = taskDone);
     }
 
     Set<Step> modifySteps(final Set<ProjectStepSnapshot> stepSnapshots) {
@@ -74,21 +85,25 @@ class Project {
 
     static class Step {
         static Step restore(ProjectStepSnapshot snapshot) {
-            return new Step(snapshot.getId(), snapshot.getDescription(), snapshot.getDaysToProjectDeadline());
+            return new Step(snapshot.getId(), snapshot.getDescription(), snapshot.getDaysToProjectDeadline(), snapshot.hasCorrespondingTask(), snapshot.isCorrespondingTaskDone());
         }
 
         private int id;
         private String description;
         private int daysToProjectDeadline;
+        private boolean hasCorrespondingTask; // flaga odpowiada nam czy dany krok ma jakis task z siebie zrobiony
+        private boolean correspondingTaskDone;  // czy powiazany task zostal już zrobiony
 
-        private Step(final int id, final String description, final int daysToProjectDeadline) {
+        private Step(final int id, final String description, final int daysToProjectDeadline, final boolean hasCorrespondingTask, final boolean correspondingTaskDone) {
             this.id = id;
             this.description = description;
             this.daysToProjectDeadline = daysToProjectDeadline;
+            this.hasCorrespondingTask = hasCorrespondingTask;
+            this.correspondingTaskDone = correspondingTaskDone;
         }
 
         ProjectStepSnapshot getSnapshot() {
-            return new ProjectStepSnapshot(id, description, daysToProjectDeadline);
+            return new ProjectStepSnapshot(id, description, daysToProjectDeadline, hasCorrespondingTask, correspondingTaskDone);
         }
     }
 }
