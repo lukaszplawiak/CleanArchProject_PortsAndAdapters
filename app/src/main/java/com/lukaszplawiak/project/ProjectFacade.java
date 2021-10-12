@@ -5,6 +5,7 @@ import com.lukaszplawiak.project.dto.ProjectStepDto;
 import com.lukaszplawiak.task.TaskFacade;
 import com.lukaszplawiak.task.TaskQueryRepository;
 import com.lukaszplawiak.task.dto.TaskDto;
+import com.lukaszplawiak.task.vo.TaskCreator;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -51,13 +52,8 @@ public class ProjectFacade {
             throw new IllegalStateException("There are still some undone tasks from a previous project instance!");
         }
         return projectRepository.findById(projectId).map(project -> {
-            List<TaskDto> tasks = project.getSnapshot().getSteps().stream()
-                    .map(step -> TaskDto.builder()
-                            .withDescription(step.getDescription())
-                            .withDeadline(projectDeadline.plusDays(step.getDaysToProjectDeadline()))
-                            .build()
-                    ).collect(toList());
-            return taskFacade.saveAll(tasks, project.toSimpleProject());
+            Set<TaskCreator> tasks = project.convertToTasks(projectDeadline);
+            return taskFacade.createTasks(tasks);
         }).orElseThrow(() -> new IllegalArgumentException("No project found with id: " + projectId));
     }
 

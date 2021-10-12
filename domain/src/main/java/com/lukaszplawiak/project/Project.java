@@ -1,13 +1,14 @@
 package com.lukaszplawiak.project;
 
-import com.lukaszplawiak.project.dto.SimpleProject;
-import com.lukaszplawiak.project.dto.SimpleProjectSnapshot;
+import com.lukaszplawiak.task.vo.TaskCreator;
+import com.lukaszplawiak.task.vo.TaskSourceId;
 
+import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toSet;
-
 
 class Project {
     static Project restore(ProjectSnapshot snapshot) {
@@ -28,8 +29,14 @@ class Project {
         return new ProjectSnapshot(id, name, steps.stream().map(Step::getSnapshot).collect(toSet()));
     }
 
-    SimpleProject toSimpleProject() {
-        return SimpleProject.restore(new SimpleProjectSnapshot(id, name));
+    Set<TaskCreator> convertToTasks(final ZonedDateTime deadline) {
+        return steps.stream()
+                .map(step -> new TaskCreator(
+                        new TaskSourceId(String.valueOf(step.id)),
+                        step.description,
+                        deadline.plusDays(step.daysToProjectDeadline)
+                        )
+                ).collect(Collectors.toSet());
     }
 
     Set<Step> modifySteps(final Set<ProjectStepSnapshot> stepSnapshots) {

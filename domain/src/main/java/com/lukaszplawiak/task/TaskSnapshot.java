@@ -1,6 +1,6 @@
 package com.lukaszplawiak.task;
 
-import com.lukaszplawiak.project.dto.SimpleProjectSnapshot;
+import com.lukaszplawiak.task.vo.TaskSourceId;
 
 import java.time.ZonedDateTime;
 
@@ -12,7 +12,7 @@ class TaskSnapshot {
     private ZonedDateTime deadline;
     private int changesCount;
     private String additionalComment;
-    private SimpleProjectSnapshot project;
+    private TaskSourceId sourceId;
 
     protected TaskSnapshot() {
     }
@@ -23,7 +23,7 @@ class TaskSnapshot {
                         final ZonedDateTime deadline,
                         final int changesCount,
                         final String additionalComment,
-                        final SimpleProjectSnapshot project
+                        final TaskSourceId sourceId
     ) {
         this.id = id;
         this.description = description;
@@ -31,7 +31,7 @@ class TaskSnapshot {
         this.deadline = deadline;
         this.changesCount = changesCount;
         this.additionalComment = additionalComment;
-        this.project = project;
+        this.sourceId = sourceId;
     }
 
     public int getId() {
@@ -58,7 +58,7 @@ class TaskSnapshot {
         return additionalComment;
     }
 
-    public SimpleProjectSnapshot getProject() {
-        return project;
+    public TaskSourceId getSourceId() {
+        return sourceId;
     }
 }
